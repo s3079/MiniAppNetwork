@@ -11,14 +11,14 @@
         data-size="large" data-auth-url="miniapp://auth" data-request-access="write"></script>
 <script type="text/javascript">
     function onTelegramAuth(user) {
-        hideLoading();
-        const userData = {
-            firstName: user.first_name,
-            lastName: user.last_name,
-            id: user.id,
-            username: user.username || ''
-        };
-        window.ReactNativeWebView.postMessage(JSON.stringify(user));
+        window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/start'}));
+        try {
+            window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/success', data: user}));
+        } catch (error) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/error', message: error?.message}));
+        } finally {
+            window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/end'}));
+        }
     }
 </script>
 </body>
