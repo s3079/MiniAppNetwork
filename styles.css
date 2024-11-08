@@ -1,0 +1,19 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #090A0B;
+    color: white;
+}
+
+.container {
+    text-align: center;
+}
+
+#text {
+    font-size: 2em;
+    white-space: pre-wrap;
+}
