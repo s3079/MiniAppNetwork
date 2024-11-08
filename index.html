@@ -6,24 +6,10 @@
     <title>MiniApp Network</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body onload="showLoading()">
+<body>
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="miniappnetwork_bot"
         data-size="large" data-auth-url="miniapp://auth" data-request-access="write"></script>
 <script type="text/javascript">
-    function showLoading() {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = 'loading';
-        loadingDiv.innerText = 'Loading...';
-        document.body.appendChild(loadingDiv);
-    }
-
-    function hideLoading() {
-        const loadingDiv = document.getElementById('loading');
-        if (loadingDiv) {
-            loadingDiv.remove();
-        }
-    }
-
     function onTelegramAuth(user) {
         hideLoading();
         const userData = {
