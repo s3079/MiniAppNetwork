@@ -6,10 +6,25 @@
     <title>MiniApp Network</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body onload="showLoading()">
 <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="Botketplace_bot" data-size="large" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
 <script type="text/javascript">
+    function showLoading() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading';
+        loadingDiv.innerText = 'Loading...';
+        document.body.appendChild(loadingDiv);
+    }
+
+    function hideLoading() {
+        const loadingDiv = document.getElementById('loading');
+        if (loadingDiv) {
+            loadingDiv.remove();
+        }
+    }
+
     function onTelegramAuth(user) {
+        hideLoading();
         const userData = {
             firstName: user.first_name,
             lastName: user.last_name,
