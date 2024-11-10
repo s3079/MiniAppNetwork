@@ -1,19 +1,105 @@
-body, html {
-    height: 100%;
+body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: 'Roboto', sans-serif;
     background-color: #090A0B;
-    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .container {
     text-align: center;
+    color: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+    margin: auto;
 }
 
-#text {
-    font-size: 2em;
-    white-space: pre-wrap;
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    column-gap: 20px;
+}
+
+.logo-container img {
+    width: 150px;
+    height: 150px;
+}
+
+.logo-container .logo {
+    width: 134px;
+    height: 150px;
+}
+
+.line {
+    position: absolute;
+    top: 50%;
+    left: 120px;
+    right: 120px;
+    height: 6px;
+    background: linear-gradient(to right, #0C84FF, #26A5E4);
+    transform: translateY(-50%);
+    z-index: -1;
+}
+
+.auth-text {
+    margin-bottom: 40px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.button-primary {
+    background-color: #0088cc;
+    color: white;
+    font-size: 16px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.button-primary img {
+    width: 20px;
+    height: 20px;
+}
+
+.box {
+    flex-direction: column;
+    gap: 20px;
+}
+
+.button-secondary {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    font-size: 16px;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 600px) {
+    .container {
+        max-width: 500px;
+    }
+    .auth-text {
+        font-size: 20px;
+    }
 }
