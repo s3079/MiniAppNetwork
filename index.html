@@ -21,15 +21,42 @@
 </div>
 
 <script type="text/javascript">
+    // Parse URL parameters
+    function getUrlParams() {
+        const params = {};
+        const searchParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of searchParams) {
+            params[key] = value;
+        }
+        return params;
+    }
+
+    // Handle callback parameters if present
+    window.onload = function() {
+        const params = getUrlParams();
+        if (Object.keys(params).length > 0) {
+            // If we have parameters from Telegram callback
+            onTelegramAuth(params);
+        }
+    };
+
     function onTelegramAuth(user) {
         try {
             if (user) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/success', data: user}));
+                // Add timestamp to track auth time
+                const authData = {
+                    ...user,
+                    auth_time: new Date().getTime()
+                };
+                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/success', data: authData}));
             } else {
-                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/error', message: error?.message}));
+                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/error', message: 'Authentication failed'}));
             }
         } catch (error) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/error', message: error?.message}));
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                status: 'auth/error', 
+                message: error?.message || 'Unknown error occurred'
+            }));
         }
     }
 
