@@ -38,6 +38,7 @@
                     hash: user.hash,
                     auth_time: new Date().getTime()
                 });
+                console.log("data", params);
                 
                 window.location.href = `miniappnetwork://auth-callback?${params.toString()}`;
             } else {
