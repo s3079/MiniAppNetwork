@@ -15,11 +15,16 @@
     </div>
     <p class="auth-text">Access securely with Telegram.</p>
     <div class="box">
-        <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="miniappnetwork_bot" data-size="large" data-auth-url="miniappnetwork://telegram-auth" data-request-access="write"></script>    </div>
+        <script async src="https://telegram.org/js/telegram-widget.js?22" 
+            data-telegram-login="miniappnetwork_bot" 
+            data-size="large" 
+            data-onauth="onTelegramAuth(user)"
+            data-request-access="write">
+        </script>
+    </div>
 </div>
 
 <script type="text/javascript">
-
     function onTelegramAuth(user) {
         try {
             if (user) {
@@ -27,20 +32,65 @@
                     ...user,
                     auth_time: new Date().getTime()
                 };
-                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/success', data: authData}));
+                // For WebView
+                if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        status: 'auth/success', 
+                        data: authData
+                    }));
+                }
+                // For Web Browser
+                else {
+                    window.opener?.postMessage(
+                        {
+                            type: 'telegram-auth',
+                            status: 'success',
+                            data: authData
+                        },
+                        '*'
+                    );
+                    window.close();
+                }
             } else {
-                window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/error', message: 'Authentication failed'}));
+                const errorMessage = {status: 'auth/error', message: 'Authentication failed'};
+                if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify(errorMessage));
+                } else {
+                    window.opener?.postMessage({
+                        type: 'telegram-auth',
+                        ...errorMessage
+                    }, '*');
+                    window.close();
+                }
             }
         } catch (error) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-                status: 'auth/error', 
+            const errorData = {
+                status: 'auth/error',
                 message: error?.message || 'Unknown error occurred'
-            }));
+            };
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify(errorData));
+            } else {
+                window.opener?.postMessage({
+                    type: 'telegram-auth',
+                    ...errorData
+                }, '*');
+                window.close();
+            }
         }
     }
 
-    function onClose(){
-        window.ReactNativeWebView.postMessage(JSON.stringify({status: 'auth/cancel'}));
+    function onClose() {
+        const cancelData = {status: 'auth/cancel'};
+        if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify(cancelData));
+        } else {
+            window.opener?.postMessage({
+                type: 'telegram-auth',
+                ...cancelData
+            }, '*');
+            window.close();
+        }
     }
 </script>
 </body>

@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "MiniAppNetwork",
+    "slug": "miniappnetwork",
+    "version": "1.0.0",
+    "scheme": "miniappnetwork",
+    "ios": {
+      "bundleIdentifier": "com.miniappnetwork.app",
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:mini-app-network.vercel.app"
+      ]
+    },
+    "android": {
+      "package": "com.miniappnetwork.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "miniappnetwork",
+              "host": "*"
+            },
+            {
+              "scheme": "https",
+              "host": "mini-app-network.vercel.app"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "plugins": [
+      "expo-linking"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
+  }
+}
