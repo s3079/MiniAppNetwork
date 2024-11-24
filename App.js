@@ -1,37 +1,81 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Alert, Modal, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Alert } from 'react-native';
 import * as Linking from 'expo-linking';
-import WebView from 'react-native-webview';
+import * as WebBrowser from 'expo-web-browser';
 
 export default function App() {
   const [userData, setUserData] = useState(null);
-  const [showWebView, setShowWebView] = useState(false);
-  const webViewRef = useRef(null);
 
-  const handleMessage = (event) => {
+  useEffect(() => {
+    // Set up deep link handler
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Check for initial URL
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const handleDeepLink = (event) => {
     try {
-      const data = JSON.parse(event.nativeEvent.data);
-      console.log('Received message:', data);
+      const url = event.url || event;
+      console.log('Handling deep link:', url);
 
-      if (data.status === 'auth/success') {
-        setUserData(data.data);
-        setShowWebView(false);
+      const { path, queryParams } = Linking.parse(url);
+
+      if (path === 'auth-callback') {
+        if (queryParams.error) {
+          Alert.alert('Error', decodeURIComponent(queryParams.error));
+          return;
+        }
+
+        // Handle successful authentication
+        const telegramData = {
+          id: queryParams.id,
+          first_name: queryParams.first_name,
+          last_name: queryParams.last_name,
+          username: queryParams.username,
+          photo_url: queryParams.photo_url,
+          auth_date: queryParams.auth_date,
+          hash: queryParams.hash,
+          auth_time: queryParams.auth_time
+        };
+
+        console.log('Telegram auth data:', telegramData);
+        setUserData(telegramData);
         Alert.alert('Success', 'Successfully logged in with Telegram!');
-      } else if (data.status === 'auth/error') {
-        setShowWebView(false);
-        Alert.alert('Error', data.message || 'Authentication failed');
-      } else if (data.status === 'auth/cancel') {
-        setShowWebView(false);
       }
     } catch (error) {
-      console.error('Error handling message:', error);
-      setShowWebView(false);
-      Alert.alert('Error', 'Failed to process authentication');
+      console.error('Error handling deep link:', error);
+      Alert.alert('Error', 'Failed to handle authentication');
     }
   };
 
-  const openTelegramAuth = () => {
-    setShowWebView(true);
+  const openTelegramAuth = async () => {
+    try {
+      const result = await WebBrowser.openAuthSessionAsync(
+        'https://mini-app-network.vercel.app/',
+        'miniappnetwork://auth-callback',
+        {
+          showInRecents: true
+        }
+      );
+      
+      console.log('WebBrowser result:', result);
+      
+      if (result.type === 'cancel') {
+        console.log('Auth session was canceled');
+      }
+    } catch (error) {
+      console.error('Error opening auth session:', error);
+      Alert.alert('Error', 'Failed to open authentication page');
+    }
   };
 
   return (
@@ -46,24 +90,6 @@ export default function App() {
           Login with Telegram
         </Text>
       )}
-
-      <Modal
-        visible={showWebView}
-        onRequestClose={() => setShowWebView(false)}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <View style={{ flex: 1 }}>
-          <WebView
-            ref={webViewRef}
-            source={{ uri: 'https://mini-app-network.vercel.app/' }}
-            onMessage={handleMessage}
-            style={{ flex: 1 }}
-            incognito={true}
-            cacheEnabled={false}
-          />
-        </View>
-      </Modal>
     </View>
   );
 }

@@ -28,68 +28,23 @@
     function onTelegramAuth(user) {
         try {
             if (user) {
-                const authData = {
-                    ...user,
+                const params = new URLSearchParams({
+                    id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name || '',
+                    username: user.username || '',
+                    photo_url: user.photo_url || '',
+                    auth_date: user.auth_date,
+                    hash: user.hash,
                     auth_time: new Date().getTime()
-                };
-                // For WebView
-                if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                        status: 'auth/success', 
-                        data: authData
-                    }));
-                }
-                // For Web Browser
-                else {
-                    window.opener?.postMessage(
-                        {
-                            type: 'telegram-auth',
-                            status: 'success',
-                            data: authData
-                        },
-                        '*'
-                    );
-                    window.close();
-                }
+                });
+                
+                window.location.href = `miniappnetwork://auth-callback?${params.toString()}`;
             } else {
-                const errorMessage = {status: 'auth/error', message: 'Authentication failed'};
-                if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify(errorMessage));
-                } else {
-                    window.opener?.postMessage({
-                        type: 'telegram-auth',
-                        ...errorMessage
-                    }, '*');
-                    window.close();
-                }
+                window.location.href = 'miniappnetwork://auth-callback?error=Authentication failed';
             }
         } catch (error) {
-            const errorData = {
-                status: 'auth/error',
-                message: error?.message || 'Unknown error occurred'
-            };
-            if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(JSON.stringify(errorData));
-            } else {
-                window.opener?.postMessage({
-                    type: 'telegram-auth',
-                    ...errorData
-                }, '*');
-                window.close();
-            }
-        }
-    }
-
-    function onClose() {
-        const cancelData = {status: 'auth/cancel'};
-        if (window.ReactNativeWebView) {
-            window.ReactNativeWebView.postMessage(JSON.stringify(cancelData));
-        } else {
-            window.opener?.postMessage({
-                type: 'telegram-auth',
-                ...cancelData
-            }, '*');
-            window.close();
+            window.location.href = `miniappnetwork://auth-callback?error=${encodeURIComponent(error.message || 'Unknown error occurred')}`;
         }
     }
 </script>
