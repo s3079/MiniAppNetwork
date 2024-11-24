@@ -30,26 +30,23 @@ export default function App() {
       const { path, queryParams } = Linking.parse(url);
 
       if (path === 'auth-callback') {
-        if (queryParams.error) {
-          Alert.alert('Error', decodeURIComponent(queryParams.error));
+        if (!queryParams.data) {
+          Alert.alert('Error', 'No authentication data received');
           return;
         }
 
-        // Handle successful authentication
-        const telegramData = {
-          id: queryParams.id,
-          first_name: queryParams.first_name,
-          last_name: queryParams.last_name,
-          username: queryParams.username,
-          photo_url: queryParams.photo_url,
-          auth_date: queryParams.auth_date,
-          hash: queryParams.hash,
-          auth_time: queryParams.auth_time
-        };
+        const data = JSON.parse(decodeURIComponent(queryParams.data));
+        console.log('Received data:', data);
 
-        console.log('Telegram auth data:', telegramData);
-        setUserData(telegramData);
-        Alert.alert('Success', 'Successfully logged in with Telegram!');
+        if (data.status === 'error') {
+          Alert.alert('Error', data.message || 'Authentication failed');
+          return;
+        }
+
+        if (data.status === 'success') {
+          setUserData(data);
+          Alert.alert('Success', 'Successfully logged in with Telegram!');
+        }
       }
     } catch (error) {
       console.error('Error handling deep link:', error);
@@ -63,7 +60,8 @@ export default function App() {
         'https://mini-app-network.vercel.app/',
         'miniappnetwork://auth-callback',
         {
-          showInRecents: true
+          showInRecents: true,
+          preferEphemeralSession: true
         }
       );
       

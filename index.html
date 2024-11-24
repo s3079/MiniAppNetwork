@@ -24,11 +24,20 @@
     </div>
 </div>
 
+<form id="redirectForm" method="post" style="display: none;">
+    <input type="hidden" name="data" id="authData">
+</form>
+
 <script type="text/javascript">
+    // Function to safely encode data for URL
+    function encodeData(data) {
+        return encodeURIComponent(JSON.stringify(data));
+    }
+
     function onTelegramAuth(user) {
         try {
             if (user) {
-                const params = new URLSearchParams({
+                const authData = {
                     id: user.id,
                     first_name: user.first_name,
                     last_name: user.last_name || '',
@@ -36,16 +45,39 @@
                     photo_url: user.photo_url || '',
                     auth_date: user.auth_date,
                     hash: user.hash,
-                    auth_time: new Date().getTime()
-                });
-                console.log("data", params);
+                    auth_time: new Date().getTime(),
+                    status: 'success'
+                };
+
+                console.log('Auth data:', authData);
                 
-                window.location.href = `miniappnetwork://auth-callback?${params.toString()}`;
+                // Create a temporary link and click it
+                const a = document.createElement('a');
+                a.href = `miniappnetwork://auth-callback?data=${encodeData(authData)}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             } else {
-                window.location.href = 'miniappnetwork://auth-callback?error=Authentication failed';
+                const errorData = {
+                    status: 'error',
+                    message: 'Authentication failed'
+                };
+                const a = document.createElement('a');
+                a.href = `miniappnetwork://auth-callback?data=${encodeData(errorData)}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             }
         } catch (error) {
-            window.location.href = `miniappnetwork://auth-callback?error=${encodeURIComponent(error.message || 'Unknown error occurred')}`;
+            const errorData = {
+                status: 'error',
+                message: error.message || 'Unknown error occurred'
+            };
+            const a = document.createElement('a');
+            a.href = `miniappnetwork://auth-callback?data=${encodeData(errorData)}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     }
 </script>
